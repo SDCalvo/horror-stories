@@ -21,6 +21,10 @@ router.post("/", async (req, res) => {
     generations,
   } = req.body;
 
+  if (!temperature || !generations) {
+    res.status(400).send("temperature and generations are required parameters");
+  }
+
   try {
     const finalResponse = [];
     const firstInstructionPrompt = generateFirstInstructionPrompt(
@@ -62,7 +66,9 @@ router.post("/", async (req, res) => {
       tempInstructions: instructions,
     };
 
-    for (let i = 0; i < generations; i++) {
+    let indexes = Array.from({ length: generations }, (_, i) => i); // [0, 1, 2, ..., generations - 1]
+
+    for (let i of indexes) {
       logConsoleMessage(`Generation ${i + 1}`);
       const reviseStoryPrompt = generateReviseStoryPrompt(
         genre,
@@ -107,7 +113,7 @@ router.post("/", async (req, res) => {
         parseMessageContent(reviseReviewResponse);
       tempObject.tempReview = revisedReview;
       tempObject.tempInstructions = revisedInstructions;
-    } //FIX FOR LOOP NOT WORKING WITH ASYNC AWAIT
+    }
     res.send(finalResponse);
   } catch (error) {
     console.log(error);

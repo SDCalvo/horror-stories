@@ -18,10 +18,10 @@ function generateFirstInstructionPrompt(
     If any of the requirement items is empty, it means that you can choose whatever you want for that item.
     The story should be written in ${language || "english"}.
     You can leave notes for the reviewer if there is anything you want them to know before they start reviewing your story.
-
-    Please use this exact format for your answer:
-    1.Story: <your story here>
-    2.Notes: <your notes here>
+    If at any point for whatever reason you need to use a numbered list instead use a lettered list (a, b, c, ...) to avoid conflicts with the numbering in the response format.
+    Please use this exact format for your answer (the numbers are very important):
+    1. Story: <your story here>
+    2. Notes: <your notes here>
 ========================
 Your answer:
 `;
@@ -53,11 +53,11 @@ function generateReviewPrompt(
     Theme: ${theme}
     If any of the requirement items is empty, it means that the writer could choose whatever they wanted for that item.
     The story should be written in ${language || "english"}.
-
     Please review the story and leave instructions for the writer on how to improve it.
-    Please use this exact format for your answer:
-    1.Review: <your review here>
-    2.Notes: <your instructions here>
+    If at any point for whatever reason you need to use a numbered list instead use a lettered list (a, b, c, ...) to avoid conflicts with the numbering in the response format.
+    Please use this exact format for your answer (the numbers are very important):
+    1. Review: <your review here>
+    2. Notes: <your instructions here>
     `;
 
   return prompt;
@@ -89,10 +89,10 @@ Theme: ${theme}
 If any of the requirement items is empty, it means that you can choose whatever you want for that item.
 The story should be written in ${language || "english"}.
 You can leave notes for the reviewer if there is anything you want them to know before they start reviewing your story.
-
-Please use this exact format for your answer:
-1.Story: <your story here>
-2.Notes: <your notes here>
+If at any point for whatever reason you need to use a numbered list instead use a lettered list (a, b, c, ...) to avoid conflicts with the numbering in the response format.
+Please use this exact format for your answer (the numbers are very important):
+1. Story: <your story here>
+2. Notes: <your notes here>
 ========================
 Your answer:
 `;
