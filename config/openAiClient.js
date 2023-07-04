@@ -1,8 +1,12 @@
 import { Configuration, OpenAIApi } from "openai";
 
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
+function openAi(temperature) {
+  const configuration = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY,
+    temperature: temperature,
+  });
+  const openaiClient = new OpenAIApi(configuration);
+  return openaiClient;
+}
 
-export default openai;
+export default openAi;
