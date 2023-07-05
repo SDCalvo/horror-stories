@@ -15,6 +15,7 @@ function generateFirstInstructionPrompt(
     Setting: ${setting}
     Mood: ${mood}
     Theme: ${theme}
+    Length: one page long at least.
     If any of the requirement items is empty, it means that you can choose whatever you want for that item.
     The story should be written in ${language || "english"}.
     You can leave notes for the reviewer if there is anything you want them to know before they start reviewing your story.
@@ -22,6 +23,10 @@ function generateFirstInstructionPrompt(
     Please use this exact format for your answer (the numbers are very important):
     1. Story: <your story here>
     2. Notes: <your notes here>
+
+    An example of a good response is:
+    1. Story: Some story.
+    2. Notes: Some notes.
 ========================
 Your answer:
 `;
@@ -58,6 +63,12 @@ function generateReviewPrompt(
     Please use this exact format for your answer (the numbers are very important):
     1. Review: <your review here>
     2. Notes: <your instructions here>
+
+    An example of a good response is:
+    1. Review: Some review.
+    2. Notes: Some instructions.
+========================
+Your answer:
     `;
 
   return prompt;
@@ -71,21 +82,24 @@ function generateReviseStoryPrompt(
   theme,
   language,
   story,
-  notes
+  review,
+  instructions
 ) {
   const reviseStoryPrompt = `
 You are a world class writer. With writing skills comparable to the best writers in history.
 You work in tandem with a reviewer who is a world class critic. With a critical eye comparable to the best critics in history.
 This is your last version of the story:
 Story: ${story}
-Your reviewer left the following notes for you:
-Notes: ${notes}
+Your reviewer left the following for you:
+Review: ${review}
+Instructions: ${instructions}
 Here is a list of the requirements for your story:
 Genre: ${genre}
 Characters: ${characters}
 Setting: ${setting}
 Mood: ${mood}
 Theme: ${theme}
+Length: one page long at least.
 If any of the requirement items is empty, it means that you can choose whatever you want for that item.
 The story should be written in ${language || "english"}.
 You can leave notes for the reviewer if there is anything you want them to know before they start reviewing your story.
@@ -93,6 +107,10 @@ If at any point for whatever reason you need to use a numbered list instead use 
 Please use this exact format for your answer (the numbers are very important):
 1. Story: <your story here>
 2. Notes: <your notes here>
+
+An example of a good response is:
+1. Story: Some story.
+2. Notes: Some notes.
 ========================
 Your answer:
 `;

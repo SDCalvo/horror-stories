@@ -23,6 +23,7 @@ router.post("/", async (req, res) => {
 
   if (!temperature || !generations) {
     res.status(400).send("temperature and generations are required parameters");
+    return;
   }
 
   try {
@@ -43,55 +44,21 @@ router.post("/", async (req, res) => {
     const { first: story, second: writerNotes } = parseMessageContent(
       firstInstructionResponse
     );
-    const reviewPrompt = generateReviewPrompt(
-      genre,
-      characters,
-      setting,
-      mood,
-      theme,
-      language,
-      story,
-      writerNotes
-    );
-    const reviewResponse = await getGPTReponse(reviewPrompt, temperature);
-    console.log(reviewResponse);
 
-    const { first: review, second: instructions } =
-      parseMessageContent(reviewResponse);
-    finalResponse.push(firstInstructionResponse, reviewResponse);
     const tempObject = {
       tempStory: story,
       tempNotes: writerNotes,
-      tempReview: review,
-      tempInstructions: instructions,
+      tempReview: "",
+      tempInstructions: "",
     };
 
     let indexes = Array.from({ length: generations }, (_, i) => i); // [0, 1, 2, ..., generations - 1]
-
+    finalResponse.push({
+      firstStory: story,
+      firstNotes: writerNotes,
+    });
     for (let i of indexes) {
       logConsoleMessage(`Generation ${i + 1}`);
-      const reviseStoryPrompt = generateReviseStoryPrompt(
-        genre,
-        characters,
-        setting,
-        mood,
-        theme,
-        language,
-        tempObject.tempStory,
-        tempObject.tempNotes
-      );
-
-      const reviseStoryResponse = await getGPTReponse(
-        reviseStoryPrompt,
-        temperature
-      );
-      console.log(reviseStoryResponse);
-      finalResponse.push(reviseStoryResponse);
-      const { first: revisedStory, second: revisedNotes } =
-        parseMessageContent(reviseStoryResponse);
-      tempObject.tempStory = revisedStory;
-      tempObject.tempNotes = revisedNotes;
-
       const reviseReviewPrompt = generateReviewPrompt(
         genre,
         characters,
@@ -108,16 +75,59 @@ router.post("/", async (req, res) => {
         temperature
       );
       console.log(reviseReviewResponse);
-      finalResponse.push(reviseReviewResponse);
       const { first: revisedReview, second: revisedInstructions } =
         parseMessageContent(reviseReviewResponse);
+      finalResponse.push({
+        [`instructions${i + 1}`]: revisedInstructions,
+        [`review${i + 1}`]: revisedReview,
+      });
       tempObject.tempReview = revisedReview;
       tempObject.tempInstructions = revisedInstructions;
+
+      const reviseStoryPrompt = generateReviseStoryPrompt(
+        genre,
+        characters,
+        setting,
+        mood,
+        theme,
+        language,
+        tempObject.tempStory,
+        tempObject.tempReview,
+        tempObject.tempInstructions
+      );
+
+      const reviseStoryResponse = await getGPTReponse(
+        reviseStoryPrompt,
+        temperature
+      );
+      console.log(reviseStoryResponse);
+      const { first: revisedStory, second: revisedNotes } =
+        parseMessageContent(reviseStoryResponse);
+      finalResponse.push({
+        [`notes${i + 1}`]: revisedNotes,
+        [`story${i + 1}`]: revisedStory,
+      });
+      tempObject.tempStory = revisedStory;
+      tempObject.tempNotes = revisedNotes;
     }
-    res.send(finalResponse);
+    const formatedFinalResponse = formatFinalResponse(finalResponse);
+    res.send(formatedFinalResponse);
+    logConsoleMessage("Response sent");
   } catch (error) {
     console.log(error);
   }
 });
+
+function formatFinalResponse(responseArray) {
+  let finalResponseObject = {};
+
+  responseArray.forEach((item, index) => {
+    for (const [key, value] of Object.entries(item)) {
+      finalResponseObject[key] = value;
+    }
+  });
+
+  return JSON.stringify(finalResponseObject);
+}
 
 export default router;
